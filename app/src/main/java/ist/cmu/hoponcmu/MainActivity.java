@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences prefs = this.getSharedPreferences(Config.DATA_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = this.getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
         boolean logged = prefs.getBoolean("logged", false);
         String username = prefs.getString("username", null);
 
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             OkHttpClient client = new OkHttpClient();
 
             try {
-                URL url = new URL("http://localhost:8080/quizzes/5" + mQuizId);
+                URL url = new URL("http://localhost:8080/quizzes/M14" + mQuizId);
                 Log.d("URLCENAS", url.toString());
 
                 Request request = new Request.Builder().url(url).build();
@@ -93,12 +93,9 @@ public class MainActivity extends AppCompatActivity {
                 quizzesArray = jsonObject.getJSONArray(("quizzes"));
 
                 return (quizzesArray != null && quizzesArray.length() > 0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-
 
             return null;
         }

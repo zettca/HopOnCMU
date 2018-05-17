@@ -25,29 +25,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "zettca:zettca", "nucleardannyd@nucleardannyd"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
@@ -109,7 +105,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && !isPasswordInputValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -120,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
             cancel = true;
-        } else if (!isUsernameValid(username)) {
+        } else if (!isUsernameInputValid(username)) {
             mUsernameView.setError(getString(R.string.error_invalid_username));
             focusView = mUsernameView;
             cancel = true;
@@ -139,13 +135,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private boolean isUsernameValid(String username) {
-        //TODO: Replace this with your own logic
-        return username.length() > 0;
+    private boolean isUsernameInputValid(String username) {
+        return username.length() > 4;
     }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+    private boolean isPasswordInputValid(String password) {
         return password.length() >= 4;
     }
 
@@ -231,50 +225,57 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mUsername;
         private final String mPassword;
 
+        private final OkHttpClient client = new OkHttpClient();
+
         UserLoginTask(String username, String password) {
             mUsername = username;
-            mPassword = password;
+            mPassword = CMUtils.verySecur3H4sh(password.getBytes());
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+        protected String doInBackground(Void... params) {
+            String postURL = "http://193.136.167.55:8080/login";
+            String postData = String.format("username=%s&password=%s&a=2", mUsername, mPassword);
+            MediaType contentType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody requestBody = RequestBody.create(contentType, postData);
+            Request request = new Request.Builder().url(postURL).post(requestBody).build();
+
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (response == null) return null;
+            ResponseBody responseBody = response.body();
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+                JSONObject jsonResponse = new JSONObject(responseBody.string());
+                return jsonResponse.getString("token");
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final String token) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                postLoginStuff(mUsername);
-                finish();
-            } else {
+            if (token == null) {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            } else {
+                finish();
+                postLoginStuff(mUsername, token);
             }
         }
 
@@ -285,14 +286,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void postLoginStuff(String username) {
-        SharedPreferences prefs = this.getSharedPreferences(Config.DATA_NAME, Context.MODE_PRIVATE);
+    private void postLoginStuff(String username, String token) {
+        SharedPreferences prefs = this.getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        String token = ""; // TODO: get a JWT from the server?
 
-        editor.putBoolean("logged", true).apply();
+        editor.putBoolean("logged", true);
         editor.putString("username", username);
-        editor.putString("token", token).apply();
+        editor.putString("token", token);
+        editor.apply();
 
         startActivity(new Intent(this, MainActivity.class));
     }
