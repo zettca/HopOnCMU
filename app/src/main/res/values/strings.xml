@@ -3,11 +3,11 @@
 
     <string name="welcome">Welcome %1s</string>
 
-    <!-- Strings related to HopOnCMU -->
+    <!-- Strings related to HopOnCMU Titles -->
     <string name="welcome_message">Welcome to HopOnCMU!</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Locations</string>
-    <string name="title_notifications">Settings</string>
+    <string name="title_home">Locations</string>
+    <string name="title_dashboard">Quizzes</string>
+    <string name="title_notifications">Ranking</string>
     <string name="title_activity_login">Login</string>
 
     <!-- Strings related to login -->
@@ -21,12 +21,9 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+
     <string name="button_logout">Logout</string>
-    <string name="refresh">Refresh</string>
-    <string name="ranking">Ranking</string>
 
-
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_fragment">Hello Fragment %1s</string>
 </resources>

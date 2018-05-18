@@ -22,7 +22,7 @@ public class StartActivity extends AppCompatActivity {
         final boolean isLoggedIn = prefs.getBoolean("logged", false);
 
         if (isLoggedIn) {
-            startActivity(new Intent(this, PrimaryActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, LoginActivity.class));
         }

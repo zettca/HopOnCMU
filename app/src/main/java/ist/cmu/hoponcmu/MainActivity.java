@@ -1,30 +1,18 @@
 package ist.cmu.hoponcmu;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,18 +23,30 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    fragment = LocationFragment.newInstance();
                     mTextMessage.setText(R.string.title_home);
-                    return true;
+                    break;
                 case R.id.navigation_dashboard:
+                    fragment = QuizzesFragment.newInstance("", "");
                     mTextMessage.setText(R.string.title_dashboard);
-                    return true;
+                    break;
                 case R.id.navigation_notifications:
+                    fragment = RankingFragment.newInstance("", "");
                     mTextMessage.setText(R.string.title_notifications);
-                    return true;
+                    break;
             }
-            return false;
+
+            if (fragment == null) {
+                return false;
+            } else {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.main_container, fragment).commit();
+
+                return true;
+            }
         }
     };
 
@@ -55,9 +55,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences prefs = this.getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
         boolean logged = prefs.getBoolean("logged", false);
         String username = prefs.getString("username", null);
+        String authToken = prefs.getString("token", null);
 
         mTextMessage = (TextView) findViewById(R.id.message);
 
@@ -71,9 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (logged && username != null) {
             mTextMessage.setText(getString(R.string.welcome, username));
-
-            GetQuizzesTask mQuizzesTask = new GetQuizzesTask("M14");
-            mQuizzesTask.execute((Void) null);
         }
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -91,54 +89,4 @@ public class MainActivity extends AppCompatActivity {
 
         startActivity(new Intent(this, LoginActivity.class));
     }
-
-    public class GetQuizzesTask extends AsyncTask<Void, Void, Boolean> {
-        private String mQuizId;
-        private JSONArray quizzesArray;
-
-        public GetQuizzesTask(String quizId) {
-            mQuizId = quizId;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            String getParams = "?location=" + mQuizId;
-
-            SharedPreferences prefs = getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
-            String authToken = prefs.getString("token", "");
-
-            Response response = CMUtils.getData("quizzes", getParams, authToken);
-
-            try {
-                String data = response.body().string();
-                mTextMessage.setText(data);
-                //Toast.makeText(this, data.toCharArray(), Toast.LENGTH_SHORT).show();
-                JSONObject jsonObject = new JSONObject(data);
-                quizzesArray = jsonObject.getJSONArray(("quizzes"));
-                return true;
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            super.onPostExecute(success);
-
-            if (success) {
-                doStuffwithQuizzes(quizzesArray);
-            }
-        }
-    }
-
-    private void doStuffwithQuizzes(JSONArray quizzesArray) {
-        try {
-            mTextMessage.setText(quizzesArray.join(" "));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

@@ -3,8 +3,11 @@ package ist.cmu.hoponcmu;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -17,7 +20,7 @@ import okhttp3.Response;
 public final class CMUtils {
     public static final String HASH_ALGORITHM = "SHA-256";
     public static String DATA_NAME = "DATA";
-    public static String baseURL = "http://193.136.167.55:8080/";
+    public static String baseURL = "http://10.0.2.2:8080/";
 
     public static String verySecur3H4sh(byte[] data) {
         try {

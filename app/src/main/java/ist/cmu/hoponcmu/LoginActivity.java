@@ -136,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isUsernameInputValid(String username) {
-        return username.length() > 4;
+        return username.length() >= 4;
     }
 
     private boolean isPasswordInputValid(String password) {
@@ -226,20 +226,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
-
         private final String mUsername;
         private final String mPassword;
 
-        private final OkHttpClient client = new OkHttpClient();
-
         UserLoginTask(String username, String password) {
             mUsername = username;
-            mPassword = CMUtils.verySecur3H4sh(password.getBytes());
+            mPassword = CMUtils.verySecur3H4sh(password.trim().getBytes());
         }
 
         @Override
         protected String doInBackground(Void... params) {
-            String postData = String.format("username=%s&password=%s&a=2", mUsername, mPassword);
+            String postData = String.format("username=%s&password=%s", mUsername, mPassword);
 
             Response response = CMUtils.postData("login", postData, null);
 
