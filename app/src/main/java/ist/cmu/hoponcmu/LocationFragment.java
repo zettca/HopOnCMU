@@ -25,7 +25,6 @@ import okhttp3.Response;
  * create an instance of this fragment.
  */
 public class LocationFragment extends Fragment {
-
     private OnFragmentInteractionListener mListener;
 
     public LocationFragment() {
@@ -38,7 +37,6 @@ public class LocationFragment extends Fragment {
      *
      * @return A new instance of fragment LocationFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LocationFragment newInstance() {
         return new LocationFragment();
     }
@@ -46,15 +44,15 @@ public class LocationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        new GetLocationsTask().execute();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_location, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
+        View view = inflater.inflate(R.layout.fragment_location, container, false);
+
+        new GetLocationsTask().execute();
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

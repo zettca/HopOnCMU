@@ -7,7 +7,7 @@
     tools:context=".QuizAnswerActivity">
 
     <Button
-        android:id="@+id/button_submit"
+        android:id="@+id/button_submit_quiz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -26,6 +26,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Question Goes Here!"
+        android:textColor="@color/colorAccent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

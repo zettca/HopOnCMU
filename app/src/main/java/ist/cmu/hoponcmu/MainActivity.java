@@ -31,11 +31,11 @@ public class MainActivity extends AppCompatActivity {
                     mTextMessage.setText(R.string.title_home);
                     break;
                 case R.id.navigation_dashboard:
-                    fragment = QuizzesFragment.newInstance("", "");
+                    fragment = QuizzesFragment.newInstance();
                     mTextMessage.setText(R.string.title_dashboard);
                     break;
                 case R.id.navigation_notifications:
-                    fragment = RankingFragment.newInstance("", "");
+                    fragment = RankingFragment.newInstance();
                     mTextMessage.setText(R.string.title_notifications);
                     break;
             }
@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(R.id.main_container, fragment).commit();
-
                 return true;
             }
         }

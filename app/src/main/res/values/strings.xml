@@ -25,6 +25,7 @@
     <string name="button_logout">Logout</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_fragment">Hello Fragment %1s</string>
+    <string name="loading_locations">Loading locations...</string>
+    <string name="loading_ranking">Loading ranking...</string>
     <string name="button_connect">Connect</string>
 </resources>
