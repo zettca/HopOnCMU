@@ -239,18 +239,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected String doInBackground(Void... params) {
-            String postURL = "http://193.136.167.55:8080/login";
             String postData = String.format("username=%s&password=%s&a=2", mUsername, mPassword);
-            MediaType contentType = MediaType.parse("application/x-www-form-urlencoded");
-            RequestBody requestBody = RequestBody.create(contentType, postData);
-            Request request = new Request.Builder().url(postURL).post(requestBody).build();
 
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Response response = CMUtils.postData("login", postData, null);
 
             if (response == null) return null;
             ResponseBody responseBody = response.body();

@@ -1,24 +1,23 @@
 package ist.cmu.hoponcmu;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Base64;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public final class CMUtils {
     public static final String HASH_ALGORITHM = "SHA-256";
     public static String DATA_NAME = "DATA";
-    public static URL baseURL;
-
-    public static OkHttpClient client = new OkHttpClient();
-
-    public CMUtils(String url) throws MalformedURLException {
-        baseURL = new URL(url);
-    }
+    public static String baseURL = "http://193.136.167.55:8080/";
 
     public static String verySecur3H4sh(byte[] data) {
         try {
@@ -28,6 +27,48 @@ public final class CMUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Response getData(String endpoint, String getParams, String authToken) {
+        String url = baseURL + endpoint + getParams;
+        Request.Builder builder = new Request.Builder().url(url);
+        OkHttpClient client = new OkHttpClient();
+
+        if (authToken != null) {
+            builder.addHeader("Authorization", "Bearer " + authToken);
+        }
+
+        Request request = builder.build();
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public static Response postData(String endpoint, String postData, String authToken) {
+        String url = baseURL + endpoint;
+        MediaType contentType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody requestBody = RequestBody.create(contentType, postData);
+        Request.Builder builder = new Request.Builder().url(url).post(requestBody);
+        OkHttpClient client = new OkHttpClient();
+
+        if (authToken != null) {
+            builder.addHeader("Authorization", "Bearer " + authToken);
+        }
+
+        Request request = builder.build();
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
 
 }

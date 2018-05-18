@@ -3,9 +3,8 @@ package ist.cmu.hoponcmu;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -21,12 +20,9 @@ public class StartActivity extends AppCompatActivity {
 
         SharedPreferences prefs = this.getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
         final boolean isLoggedIn = prefs.getBoolean("logged", false);
-        Log.d("LOGGED VALUE", isLoggedIn ? "TRUE" : "FALSE");
-
-        // TODO: implement some kind of session (JWT?)
 
         if (isLoggedIn) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, PrimaryActivity.class));
         } else {
             startActivity(new Intent(this, LoginActivity.class));
         }
