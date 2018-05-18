@@ -56,11 +56,6 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements PeerListListener, GroupInfoListener {
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
 
@@ -99,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
                 transaction.replace(R.id.main_container, fragment).commit();
+
                 return true;
             }
         }
@@ -138,18 +134,6 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        doFindQuizzes();
-    }
-
-    private void doFindQuizzes() {
-        SharedPreferences prefs = getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        Set<String> locationIDs = new HashSet<>(Arrays.asList("M14", "M42"));
-        editor.putStringSet("locationIDs", locationIDs);
-        editor.apply();
-    }
 
         SimWifiP2pSocketManager.Init(this.getApplicationContext());
 

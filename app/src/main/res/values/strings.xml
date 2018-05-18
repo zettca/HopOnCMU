@@ -29,4 +29,5 @@
     <string name="loading_ranking">Loading ranking...</string>
     <string name="button_connect">Connect</string>
     <string name="port">10051</string>
+
 </resources>
