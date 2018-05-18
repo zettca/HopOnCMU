@@ -15,6 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         String username = prefs.getString("username", null);
         String authToken = prefs.getString("token", null);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        mTextMessage = findViewById(R.id.message);
 
         Button mLogoutButton = findViewById(R.id.logout_button);
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +88,17 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        doFindQuizzes();
+    }
+
+    private void doFindQuizzes() {
+        SharedPreferences prefs = getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Set<String> locationIDs = new HashSet<>(Arrays.asList("M14", "M42"));
+        editor.putStringSet("locationIDs", locationIDs);
+        editor.apply();
     }
 
     private void doConnect() {

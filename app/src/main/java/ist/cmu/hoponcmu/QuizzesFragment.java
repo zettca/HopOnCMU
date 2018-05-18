@@ -2,14 +2,29 @@ package ist.cmu.hoponcmu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.w3c.dom.Text;
+
+import java.io.IOException;
+import java.util.Set;
+
+import okhttp3.Response;
+
+import static android.view.ViewGroup.LayoutParams.*;
 
 
 /**
@@ -48,19 +63,15 @@ public class QuizzesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         View view = inflater.inflate(R.layout.fragment_quizzes, container, false);
 
-        Button buttonAnswerQuiz = view.findViewById(R.id.button_answer_quiz);
-        buttonAnswerQuiz.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String question = "How many bananas?";
-                String[] options = {"2", "about 10", "0ver 9000"};
+        SharedPreferences prefs = getActivity().getSharedPreferences(
+                CMUtils.DATA_NAME, Context.MODE_PRIVATE);
+        Set<String> locationIDs = prefs.getStringSet("locationIDs", null);
+        String authToken = prefs.getString("token", null);
 
-                Intent quizAnswerIntent = new Intent(getActivity(), QuizAnswerActivity.class);
-                quizAnswerIntent.putExtra("QUESTION", question);
-                quizAnswerIntent.putExtra("OPTIONS", options);
-                startActivityForResult(quizAnswerIntent, PICK_ANSWER_REQUEST_CODE);
-            }
-        });
+        if (locationIDs == null) return view;
+        for (String locID : locationIDs) {
+            new GetQuizTask().execute(locID, authToken);
+        }
 
         return view;
     }
@@ -115,5 +126,46 @@ public class QuizzesFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    class GetQuizTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            final String locationID = params[0];
+            final String authToken = params[1];
+            final String getParams = "?location=" + locationID;
+            Response response = CMUtils.getData("quizzes", getParams, authToken);
+
+            try {
+                final String data = response.body().string();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LinearLayout layoutQuizzes = getView().findViewById(R.id.layout_quizzes);
+
+                        Button button = new Button(getActivity());
+                        button.setText("Answer quiz " + locationID);
+                        button.setLayoutParams(
+                                new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getActivity(), QuizAnswerActivity.class);
+                                intent.putExtra("DATA", data);
+                                startActivityForResult(intent, PICK_ANSWER_REQUEST_CODE);
+                            }
+                        });
+                        layoutQuizzes.addView(button);
+
+                    }
+                });
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
