@@ -1,15 +1,23 @@
 package ist.cmu.hoponcmu;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,19 +30,43 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.GroupInfoListener;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.Channel;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
+
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PeerListListener, GroupInfoListener {
 
     private TextView mTextMessage;
+
+    WifiDirectBroadcastReceiver receiver;
+
+    private SimWifiP2pManager mManager = null;
+    private Channel mChannel = null;
+    private Messenger mService = null;
+
+    private SimWifiP2pSocketServer mSrvSocket = null;
+    private SimWifiP2pSocket mCliSocket = null;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -78,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         String username = prefs.getString("username", null);
         String authToken = prefs.getString("token", null);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        mTextMessage = findViewById(R.id.message);
 
         Button mLogoutButton = findViewById(R.id.logout_button);
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doConnect();
+                doConnect(view);
             }
         });
 
@@ -100,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             mTextMessage.setText(getString(R.string.welcome, username));
         }
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         SimWifiP2pSocketManager.Init(this.getApplicationContext());
@@ -111,16 +143,44 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
 
-        WifiDirectBroadcastReceiver receiver = new WifiDirectBroadcastReceiver(this);
+        receiver = new WifiDirectBroadcastReceiver(this);
         registerReceiver(receiver, filter);
+
+        Intent intent = new Intent(MainActivity.this, SimWifiP2pService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+
+        new IncommingCommTask().executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR);
+
+        Toast toast = Toast.makeText(this, "Wif Direct On...", Toast.LENGTH_SHORT);
+        toast.show();
 
     }
 
-    private void doConnect() {
-        //TODO: implement WiFi-direct stuff
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+            mManager = new SimWifiP2pManager(mService);
+            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+        }
 
-        Toast toast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT);
-        toast.show();
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mManager = null;
+            mChannel = null;
+        }
+
+    };
+
+    private void doConnect(View v) {
+        //TODO: implement WiFi-direct
+        mManager.requestGroupInfo(mChannel, MainActivity.this);
+
+        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"192.168.0.2");
+
     }
 
     private void doLogout() {
@@ -133,5 +193,145 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
 
         startActivity(new Intent(this, LoginActivity.class));
+    }
+
+
+    @Override
+    public void onGroupInfoAvailable(SimWifiP2pDeviceList devices, SimWifiP2pInfo groupInfo) {
+
+        // compile list of network members
+        List<String> ips = new ArrayList<>();
+        StringBuilder peersStr = new StringBuilder();
+        for (String deviceName : groupInfo.getDevicesInNetwork()) {
+            SimWifiP2pDevice device = devices.getByName(deviceName);
+            if (device != null) {
+                ips.add(device.getVirtIp());
+            }
+            String devstr = "" + deviceName + " (" +
+                    ((device == null) ? "??" : ips.get(ips.size()-1)) + ")\n";
+            peersStr.append(devstr);
+        }
+        // display list of network members
+        new AlertDialog.Builder(this)
+                .setTitle("Devices in WiFi Network")
+                .setMessage(peersStr.toString())
+                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+        }
+
+    @Override
+    public void onPeersAvailable(SimWifiP2pDeviceList peers) {
+        StringBuilder peersStr = new StringBuilder();
+
+        // compile list of devices in range
+        for (SimWifiP2pDevice device : peers.getDeviceList()) {
+            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
+            peersStr.append(devstr);
+        }
+
+        // display list of devices in range
+        new AlertDialog.Builder(this)
+                .setTitle("Devices in WiFi Range")
+                .setMessage(peersStr.toString())
+                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+
+    }
+
+    public class IncommingCommTask extends AsyncTask<Void, String, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Log.d("msgsender", "IncommingCommTask started (" + this.hashCode() + ").");
+
+            try {
+                mSrvSocket = new SimWifiP2pSocketServer(
+                        Integer.parseInt(getString(R.string.port)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    SimWifiP2pSocket sock = mSrvSocket.accept();
+                    try {
+                        BufferedReader sockIn = new BufferedReader(
+                                new InputStreamReader(sock.getInputStream()));
+                        String st = sockIn.readLine();
+                        publishProgress(st);
+                        sock.getOutputStream().write(("\n").getBytes());
+                    } catch (IOException e) {
+                        Log.d("Error reading socket:", e.getMessage());
+                    } finally {
+                        sock.close();
+                    }
+                } catch (IOException e) {
+                    Log.d("Error socket:", e.getMessage());
+                    break;
+                    //e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+
+        }
+    }
+
+    public class OutgoingCommTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                mCliSocket = new SimWifiP2pSocket(params[0],
+                        Integer.parseInt(getString(R.string.port)));
+            } catch (UnknownHostException e) {
+                return "Unknown Host:" + e.getMessage();
+            } catch (IOException e) {
+                return "IO error:" + e.getMessage();
+            }
+            return null;
+        }
+    }
+
+
+    public class SendCommTask extends AsyncTask<String, String, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            try {
+                mCliSocket.getOutputStream().write(("Sending Something" + "\n").getBytes());
+                BufferedReader sockIn = new BufferedReader(
+                        new InputStreamReader(mCliSocket.getInputStream()));
+                sockIn.readLine();
+                mCliSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mCliSocket = null;
+            return null;
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mConnection);
     }
 }
