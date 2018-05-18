@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import okhttp3.Response;
@@ -80,10 +81,10 @@ public class QuizzesFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        int resInt = data.getIntExtra("ANSWER", 0);
+        int[] answers = data.getIntArrayExtra("ANSWERS");
 
         if (requestCode == PICK_ANSWER_REQUEST_CODE) {
-            Toast.makeText(getActivity(), "Got result: " + resInt, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "GOT: " + Arrays.toString(answers), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getActivity(), "Unexpected stuffs...", Toast.LENGTH_SHORT).show();
         }
