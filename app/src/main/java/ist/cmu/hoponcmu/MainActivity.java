@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,11 +63,19 @@ public class MainActivity extends AppCompatActivity {
 
         mTextMessage = (TextView) findViewById(R.id.message);
 
-        Button mLogoutButton = (Button) findViewById(R.id.logout_button);
+        Button mLogoutButton = findViewById(R.id.logout_button);
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 doLogout();
+            }
+        });
+
+        Button mConnectButton = findViewById(R.id.connect_button);
+        mConnectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doConnect();
             }
         });
 
@@ -76,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    private void doConnect() {
+        //TODO: implement WiFi-direct stuff
+
+        Toast toast = Toast.makeText(this, "Connecting...", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     private void doLogout() {
