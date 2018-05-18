@@ -5,10 +5,25 @@
     android:layout_height="match_parent"
     tools:context=".QuizzesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/layout_quizzes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_fragment" />
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorAccent"
+                android:text="@string/refresh" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>
