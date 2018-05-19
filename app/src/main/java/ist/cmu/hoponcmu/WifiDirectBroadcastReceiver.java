@@ -11,19 +11,18 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
 
     MainActivity activity;
 
-    public WifiDirectBroadcastReceiver(MainActivity activity){
-        this.activity=activity;
+    public WifiDirectBroadcastReceiver(MainActivity activity) {
+        this.activity = activity;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)){
-            int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE,1);
-            if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED){
+        if (SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+            int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, 1);
+            if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
                 //TODO
-            }
-            else {
+            } else {
                 //TODO
             }
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {

@@ -24,36 +24,25 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
-import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener;
-import pt.inesc.termite.wifidirect.SimWifiP2pManager.GroupInfoListener;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager.Channel;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.GroupInfoListener;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager.PeerListListener;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
-
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements PeerListListener, GroupInfoListener {
 
@@ -150,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
 
-        new IncommingCommTask().executeOnExecutor(
+        new IncomingCommTask().executeOnExecutor(
                 AsyncTask.THREAD_POOL_EXECUTOR);
 
         Toast toast = Toast.makeText(this, "Wif Direct On...", Toast.LENGTH_SHORT);
@@ -179,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
         //TODO: implement WiFi-direct
         mManager.requestGroupInfo(mChannel, MainActivity.this);
 
-        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"192.168.0.2");
+        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "192.168.0.2");
 
     }
 
@@ -208,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
                 ips.add(device.getVirtIp());
             }
             String devstr = "" + deviceName + " (" +
-                    ((device == null) ? "??" : ips.get(ips.size()-1)) + ")\n";
+                    ((device == null) ? "??" : ips.get(ips.size() - 1)) + ")\n";
             peersStr.append(devstr);
         }
         // display list of network members
@@ -221,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
                     }
                 })
                 .show();
-        }
+    }
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
@@ -245,12 +234,12 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
 
     }
 
-    public class IncommingCommTask extends AsyncTask<Void, String, Void> {
+    public class IncomingCommTask extends AsyncTask<Void, String, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
 
-            Log.d("msgsender", "IncommingCommTask started (" + this.hashCode() + ").");
+            Log.d("msgsender", "IncomingCommTask started (" + this.hashCode() + ").");
 
             try {
                 mSrvSocket = new SimWifiP2pSocketServer(
@@ -329,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
         super.onPause();
         unregisterReceiver(receiver);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

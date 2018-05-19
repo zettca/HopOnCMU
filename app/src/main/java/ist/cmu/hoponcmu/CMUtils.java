@@ -1,13 +1,8 @@
 package ist.cmu.hoponcmu;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 

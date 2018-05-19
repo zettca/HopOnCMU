@@ -1,23 +1,18 @@
 package ist.cmu.hoponcmu;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +20,7 @@ import java.util.Set;
 
 import okhttp3.Response;
 
-import static android.view.ViewGroup.LayoutParams.*;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 
 /**
