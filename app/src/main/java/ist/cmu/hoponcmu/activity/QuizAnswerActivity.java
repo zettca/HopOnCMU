@@ -1,4 +1,4 @@
-package ist.cmu.hoponcmu;
+package ist.cmu.hoponcmu.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,9 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.R;
 
 public class QuizAnswerActivity extends AppCompatActivity {
 

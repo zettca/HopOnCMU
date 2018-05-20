@@ -1,4 +1,4 @@
-package ist.cmu.hoponcmu;
+package ist.cmu.hoponcmu.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.R;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 

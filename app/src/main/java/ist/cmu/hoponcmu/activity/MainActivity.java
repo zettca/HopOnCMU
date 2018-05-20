@@ -1,4 +1,4 @@
-package ist.cmu.hoponcmu;
+package ist.cmu.hoponcmu.activity;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -31,6 +31,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.fragment.LocationFragment;
+import ist.cmu.hoponcmu.fragment.QuizzesFragment;
+import ist.cmu.hoponcmu.R;
+import ist.cmu.hoponcmu.fragment.RankingFragment;
+import ist.cmu.hoponcmu.WifiDirectBroadcastReceiver;
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;

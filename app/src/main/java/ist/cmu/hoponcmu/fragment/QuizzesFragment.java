@@ -1,4 +1,4 @@
-package ist.cmu.hoponcmu;
+package ist.cmu.hoponcmu.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
+import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.activity.QuizAnswerActivity;
+import ist.cmu.hoponcmu.R;
 import okhttp3.Response;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;

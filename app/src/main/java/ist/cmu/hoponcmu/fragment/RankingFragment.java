@@ -1,4 +1,4 @@
-package ist.cmu.hoponcmu;
+package ist.cmu.hoponcmu.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
+import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.R;
 import okhttp3.Response;
 
 
