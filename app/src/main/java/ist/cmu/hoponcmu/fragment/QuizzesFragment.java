@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +19,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import ist.cmu.hoponcmu.CMUtils;
-import ist.cmu.hoponcmu.activity.QuizAnswerActivity;
 import ist.cmu.hoponcmu.R;
+import ist.cmu.hoponcmu.activity.QuizAnswerActivity;
 import okhttp3.Response;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -64,15 +68,46 @@ public class QuizzesFragment extends Fragment {
 
         SharedPreferences prefs = getActivity().getSharedPreferences(
                 CMUtils.DATA_NAME, Context.MODE_PRIVATE);
-        Set<String> locationIDs = prefs.getStringSet("locationIDs", null);
+        Set<String> locationIDs = prefs.getStringSet("locationIDs", new HashSet<String>());
         String authToken = prefs.getString("token", null);
 
-        if (locationIDs == null) return view;
+        Log.w("TEST", String.format("Found %d locations", locationIDs.size()));
+
+        Button refreshButton = view.findViewById(R.id.button_refresh);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().
+                        getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager == null) return;
+
+                SharedPreferences prefs = getActivity().getSharedPreferences(
+                        CMUtils.DATA_NAME, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                Set<String> locs = prefs.getStringSet("locationIDs", new HashSet<String>());
+                String authToken = prefs.getString("token", null);
+
+                boolean wifiOn = wifiManager.isWifiEnabled();
+                String ssid = wifiManager.getConnectionInfo().getSSID();
+                locs.add((wifiOn) ? ssid : "M14");
+                editor.putStringSet("locationIDs", locs);
+                editor.apply();
+
+                showLocations(v.getRootView(), locs, authToken);
+            }
+        });
+
+        showLocations(view, locationIDs, authToken);
+
+        return view;
+    }
+
+    private void showLocations(@NonNull View view, Set<String> locationIDs, String authToken) {
+        LinearLayout layoutQuizzes = view.findViewById(R.id.layout_quizzes);
+        if (layoutQuizzes.getChildCount() > 0) layoutQuizzes.removeAllViews();
         for (String locID : locationIDs) {
             new GetQuizTask().execute(locID, authToken);
         }
-
-        return view;
     }
 
     @Override

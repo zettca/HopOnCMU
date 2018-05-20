@@ -50,7 +50,7 @@ public class QuizAnswerActivity extends AppCompatActivity {
                 for (int j = 0; j < optionsArray.length(); j++) {
                     RadioButton radioButton = new RadioButton(this);
                     radioButton.setText(optionsArray.getString(j));
-                    radioButton.setTag(i);
+                    radioButton.setTag(j);
                     radioGroup.addView(radioButton);
                 }
                 layoutView.addView(radioGroup);
@@ -77,13 +77,13 @@ public class QuizAnswerActivity extends AppCompatActivity {
                         RadioButton radioButton = radioGroup.findViewById(radioButtonID);
                         Integer tag = (Integer) radioButton.getTag();
 
-                        answers[i] = radioButtonID;
+                        answers[i] = tag;
 
                         SharedPreferences prefs = getSharedPreferences(
                                 CMUtils.DATA_NAME, Context.MODE_PRIVATE);
                         String authToken = prefs.getString("token", null);
 
-                        String postData = String.format("?questionId=%s&answer=%s", id, tag);
+                        String postData = String.format("questionId=%s&answer=%s", id, tag);
                         CMUtils.postData("quizzes", postData, authToken);
                     }
                 }
