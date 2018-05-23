@@ -145,8 +145,6 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
 
-        new IncomingCommTask().executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR);
 
         Toast toast = Toast.makeText(this, "Wif Direct On...", Toast.LENGTH_SHORT);
         toast.show();
@@ -173,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
     private void doConnect(View v) {
         //TODO: implement WiFi-direct
         mManager.requestGroupInfo(mChannel, MainActivity.this);
-
+        new IncomingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "192.168.0.2");
 
     }
