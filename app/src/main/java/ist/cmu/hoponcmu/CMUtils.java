@@ -15,7 +15,7 @@ import okhttp3.Response;
 public final class CMUtils {
     public static final String HASH_ALGORITHM = "SHA-256";
     public static String DATA_NAME = "DATA";
-    public static String baseURL = "http://10.0.2.2:8080/";
+    public static String baseURL = "https://hoponcmu36.herokuapp.com/";
 
     public static String verySecur3H4sh(byte[] data) {
         try {

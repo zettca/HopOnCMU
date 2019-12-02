@@ -261,7 +261,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 mPasswordView.requestFocus();
             } else {
                 finish();
-                postLoginStuff(mUsername, token);
+                postLoginStuff(mUsername, mPassword, token);
             }
         }
 
@@ -272,12 +272,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void postLoginStuff(String username, String token) {
-        SharedPreferences prefs = this.getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
+    private void postLoginStuff(String username, String password, String token) {
+        SharedPreferences prefs = getSharedPreferences(CMUtils.DATA_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("logged", true);
         editor.putString("username", username);
+        editor.putString("password", password);
         editor.putString("token", token);
         editor.apply();
 

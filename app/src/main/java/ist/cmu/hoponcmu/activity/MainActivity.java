@@ -32,11 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ist.cmu.hoponcmu.CMUtils;
+import ist.cmu.hoponcmu.R;
+import ist.cmu.hoponcmu.WifiDirectBroadcastReceiver;
 import ist.cmu.hoponcmu.fragment.LocationFragment;
 import ist.cmu.hoponcmu.fragment.QuizzesFragment;
-import ist.cmu.hoponcmu.R;
 import ist.cmu.hoponcmu.fragment.RankingFragment;
-import ist.cmu.hoponcmu.WifiDirectBroadcastReceiver;
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements PeerListListener,
 
         editor.putBoolean("logged", false);
         editor.remove("username");
+        editor.remove("password");
         editor.remove("token");
         editor.apply();
 

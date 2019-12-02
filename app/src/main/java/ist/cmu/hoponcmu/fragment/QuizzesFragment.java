@@ -89,6 +89,7 @@ public class QuizzesFragment extends Fragment {
 
                 boolean wifiOn = wifiManager.isWifiEnabled();
                 String ssid = wifiManager.getConnectionInfo().getSSID();
+                Log.w("DATA", ssid);
                 locs.add((wifiOn) ? ssid : "M14");
                 editor.putStringSet("locationIDs", locs);
                 editor.apply();
@@ -130,7 +131,7 @@ public class QuizzesFragment extends Fragment {
         }
     }
 
-    @Override
+    /*@Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -139,7 +140,7 @@ public class QuizzesFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
+    }*/
 
     @Override
     public void onDetach() {
